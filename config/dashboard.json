@@ -1,7 +1,8 @@
 {
+  "rotationMs": 20000,
   "pages": [
     {
-      "name": "Startseite",
+      "name": "Home",
       "widgets": [
         {
           "type": "clock",
@@ -17,13 +18,25 @@
           "title": "Kalender",
           "endpoint": "/api/calendar",
           "maxItems": 3
-        },
+        }
+      ]
+    },
+    {
+      "name": "Feed",
+      "widgets": [
         {
           "type": "feed",
           "title": "News Feed",
           "endpoint": "/api/feed",
           "source": "hn",
           "maxItems": 3
+        },
+        {
+          "type": "webcam",
+          "title": "Webcam",
+          "imageUrl": "https://placehold.co/900x600/png?text=Webcam+Snapshot",
+          "cacheBust": true,
+          "refreshMs": 300000
         }
       ]
     }

@@ -12,14 +12,21 @@
       <header class="dashboard__header">
         <p class="eyebrow">Kindle Smart Dashboard</p>
         <h1 id="page-title">Dashboard</h1>
-        <p class="subline">Widgets werden aus Konfiguration geladen.</p>
+        <p class="subline">Statisches Dashboard</p>
+        <nav class="mode-switch" aria-label="Ansichtsmodus">
+          <a href="?mode=dashboard" data-mode-link="dashboard">Dashboard</a>
+          <a href="?mode=editor" data-mode-link="editor">Editor</a>
+        </nav>
       </header>
 
       <section id="status-area" class="status-area" aria-live="polite"></section>
       <section id="widget-grid" class="widget-grid" aria-label="Dashboard Widgets"></section>
+      <section id="editor-root" class="editor-root" aria-label="Editor Oberfläche"></section>
     </main>
 
+    <script src="assets/js/utils.js" defer></script>
     <script src="assets/js/widgets.js" defer></script>
+    <script src="assets/js/editor.js" defer></script>
     <script src="assets/js/app.js" defer></script>
   </body>
 </html>

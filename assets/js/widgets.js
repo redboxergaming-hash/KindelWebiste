@@ -2,10 +2,11 @@
   "use strict";
 
   const registry = new Map();
+  const logger = (window.AppUtils && window.AppUtils.createLogger("widgets")) || console;
 
   function registerWidget(widgetDefinition) {
     if (!widgetDefinition || !widgetDefinition.type || typeof widgetDefinition.render !== "function") {
-      throw new Error("Ungültige Widget-Definition.");
+      throw new Error("Ungültige Widget-Definition (type/render erforderlich).");
     }
 
     registry.set(widgetDefinition.type, widgetDefinition);
@@ -80,8 +81,19 @@
     return payload.data.items;
   }
 
+  function withCacheBusting(url, enabled) {
+    if (!enabled) {
+      return url;
+    }
 
-
+    try {
+      const parsedUrl = new URL(url, window.location.origin);
+      parsedUrl.searchParams.set("_ts", String(Date.now()));
+      return parsedUrl.toString();
+    } catch (error) {
+      return url;
+    }
+  }
   async function fetchFeed(endpoint, source, signal) {
     const query = new URLSearchParams();
     if (source) {
@@ -182,6 +194,7 @@
             return;
           }
 
+          logger.warn("Weather-Widget konnte nicht geladen werden.", error);
           container.innerHTML =
             `<p class="widget-card__title">${widgetConfig.title || "Wetter"}</p>` +
             '<p class="widget-weather__error">Wetter derzeit nicht verfügbar.</p>';
@@ -238,6 +251,7 @@
             return;
           }
 
+          logger.warn("Kalender-Widget konnte nicht geladen werden.", error);
           container.innerHTML =
             `<p class="widget-card__title">${widgetConfig.title || "Kalender"}</p>` +
             '<p class="widget-calendar__error">Kalender derzeit nicht verfügbar.</p>';
@@ -248,7 +262,6 @@
       };
     }
   });
-
 
   registerWidget({
     type: "feed",
@@ -292,6 +305,7 @@
             return;
           }
 
+          logger.warn("Feed-Widget konnte nicht geladen werden.", error);
           container.innerHTML =
             `<p class="widget-card__title">${widgetConfig.title || "Feed"}</p>` +
             '<p class="widget-feed__error">Feed derzeit nicht verfügbar.</p>';
@@ -299,6 +313,89 @@
 
       return function destroyFeedWidget() {
         controller.abort();
+      };
+    }
+  });
+
+  registerWidget({
+    type: "webcam",
+    render(container, widgetConfig = {}) {
+      container.classList.add("widget-webcam", "widget-card--wide");
+
+      const imageUrl = widgetConfig.imageUrl || "";
+      const cacheBust = widgetConfig.cacheBust === true;
+      const refreshMs = Number.isInteger(widgetConfig.refreshMs) ? widgetConfig.refreshMs : 0;
+
+      if (!imageUrl) {
+        container.innerHTML =
+          `<p class="widget-card__title">${widgetConfig.title || "Webcam"}</p>` +
+          '<p class="widget-webcam__error">Snapshot derzeit nicht verfügbar.</p>';
+        return;
+      }
+
+      const renderLoadingState = () => {
+        container.innerHTML =
+          `<p class="widget-card__title">${widgetConfig.title || "Webcam"}</p>` +
+          '<p class="widget-webcam__loading">Lade Snapshot …</p>';
+      };
+
+      const renderImageState = (resolvedUrl) => {
+        container.innerHTML =
+          `<p class="widget-card__title">${widgetConfig.title || "Webcam"}</p>` +
+          '<div class="widget-webcam__frame">' +
+          `<img class="widget-webcam__image" src="${resolvedUrl}" alt="${widgetConfig.title || "Webcam Snapshot"}" loading="lazy" />` +
+          "</div>";
+      };
+
+      const renderErrorState = () => {
+        container.innerHTML =
+          `<p class="widget-card__title">${widgetConfig.title || "Webcam"}</p>` +
+          '<p class="widget-webcam__error">Snapshot derzeit nicht verfügbar.</p>';
+      };
+
+      let refreshIntervalId;
+      let disposed = false;
+      let loadRunId = 0;
+
+      const loadSnapshot = (showLoading) => {
+        if (showLoading) {
+          renderLoadingState();
+        }
+
+        const snapshotUrl = withCacheBusting(imageUrl, cacheBust);
+        const preloader = new Image();
+        loadRunId += 1;
+        const currentRunId = loadRunId;
+
+        preloader.onload = () => {
+          if (disposed || currentRunId !== loadRunId) {
+            return;
+          }
+          renderImageState(snapshotUrl);
+        };
+
+        preloader.onerror = () => {
+          if (disposed || currentRunId !== loadRunId) {
+            return;
+          }
+          logger.warn("Webcam-Snapshot konnte nicht geladen werden.");
+          renderErrorState();
+        };
+
+        preloader.src = snapshotUrl;
+      };
+
+      loadSnapshot(true);
+
+      if (refreshMs > 0) {
+        refreshIntervalId = window.setInterval(() => loadSnapshot(false), refreshMs);
+      }
+
+      return function destroyWebcamWidget() {
+        disposed = true;
+        if (refreshIntervalId) {
+          window.clearInterval(refreshIntervalId);
+        }
       };
     }
   });

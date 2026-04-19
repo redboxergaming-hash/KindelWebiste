@@ -1,131 +1,101 @@
-# Kindle Smart Dashboard (Basis)
+# Kindle Smart Dashboard
 
-Leichtgewichtiges, statisches Grundgerüst für ein Kindle-optimiertes Smart Dashboard.
+Leichtgewichtiges, statisches Dashboard für Kindle/E-Ink mit optionalem iPhone-Editor (lokal im Browserzustand).
 
-## Struktur
+## Projektstruktur
 
-- `index.html` – Startseite mit Dashboard-Layout.
-- `assets/css/styles.css` – minimalistisches Basis-Styling (E-Ink-freundlich).
-- `assets/js/widgets.js` – Widget-Registry (clock, weather, calendar, feed, placeholder).
-- `assets/js/app.js` – lädt `config/dashboard.json` und rendert die erste Seite.
-- `config/dashboard.json` – zentrale Dashboard-Konfiguration.
-- `netlify/functions/` – API-Endpunkte für Health, Wetter, Kalender und Feed.
+- `index.html` – Einstiegspunkt, lädt Dashboard- und Editor-Modus.
+- `config/dashboard.json` – zentrale Konfiguration (Pages, Widgets, Rotation).
+- `assets/css/styles.css` – minimalistisches UI (Dashboard + Editor).
+- `assets/js/utils.js` – kleine Debug-Logging-Utility.
+- `assets/js/app.js` – Moduslogik, Config-Laden, Seitenrotation, Rendering-Orchestrierung.
+- `assets/js/widgets.js` – Widget-Registry und Widget-Implementierungen.
+- `assets/js/editor.js` – lokaler Editor (ohne Server-Persistenz).
+- `netlify/functions/` – serverseitige API-Aggregation (Weather, Calendar, Feed, Health).
+- `netlify.toml` – Redirects und Functions-Konfiguration.
 
-## Lokal starten
+## Lokale Entwicklung
 
-### Option 1: Python Static Server
+### 1) Nur statisches Frontend
 
 ```bash
 python3 -m http.server 8080
 ```
 
-Danach im Browser öffnen: `http://localhost:8080`
+Dann öffnen: `http://localhost:8080`
 
-### Option 2: Netlify CLI (empfohlen für Functions)
-
-```bash
-netlify dev
-```
-
-Dann sind Seite und Functions gemeinsam verfügbar.
-
-## Feed Function (RSS Aggregation)
-
-`GET /api/feed` lädt RSS serverseitig aus einer erlaubten Quellenliste und reduziert auf ein kleines Format:
-
-```json
-{
-  "ok": true,
-  "data": {
-    "source": "hn",
-    "title": "Hacker News",
-    "items": [
-      {
-        "title": "Example headline",
-        "publishedAt": "Mon, 20 Apr 2026 10:00:00 GMT",
-        "source": "Hacker News"
-      }
-    ]
-  },
-  "meta": {
-    "generatedAt": "<ISO_DATETIME>",
-    "source": "rss",
-    "count": 1
-  }
-}
-```
-
-### Sichere Feed-Konfiguration
-
-Direkte freie URL-Übergabe vom Frontend ist absichtlich **nicht** aktiviert. Stattdessen wird serverseitig aus einer erlaubten Source-Liste gelesen.
-
-Standardquellen:
-
-- `hn` → Hacker News (`https://hnrss.org/frontpage`)
-- `bbc` → BBC World (`http://feeds.bbci.co.uk/news/world/rss.xml`)
-
-Optionale Variablen:
-
-- `FEED_DEFAULT_SOURCE` (default `hn`)
-- `FEED_MAX_ITEMS` (default `3`)
-- `FEED_TIMEOUT_MS` (default `5000`)
-- `FEED_SOURCES_JSON` (optional JSON-Map erlaubter Quellen)
-
-Beispiel für `FEED_SOURCES_JSON`:
-
-```json
-{
-  "hn": { "label": "Hacker News", "url": "https://hnrss.org/frontpage" },
-  "mynews": { "label": "My Feed", "url": "https://example.com/rss.xml" }
-}
-```
-
-### Feed lokal testen
+### 2) Frontend + Netlify Functions
 
 ```bash
 netlify dev
-curl -s "http://localhost:8888/api/feed?source=hn" | jq
 ```
 
-Fehlerfall testen (ungültige Quelle):
+Dann öffnen:
+- App: `http://localhost:8888`
+- Beispiel-API: `http://localhost:8888/api/health`
 
-```bash
-curl -s "http://localhost:8888/api/feed?source=unknown" | jq
-```
+## Netlify Deploy
 
-## Weather Function (echt)
+1. Repo mit Netlify verbinden.
+2. Environment Variables setzen (siehe unten).
+3. Deploy starten (`main`/Produktions-Branch).
+4. Redirects und Functions werden über `netlify.toml` automatisch verwendet.
 
-`GET /api/weather` ruft serverseitig OpenWeather ab und normalisiert auf ein kompaktes Format.
+## Environment Variables
 
-Erforderliche Variablen:
+### Weather (`/api/weather`)
 
+Pflicht:
 - `WEATHER_API_KEY`
 - `WEATHER_LAT`
 - `WEATHER_LON`
 
 Optional:
-
 - `WEATHER_UNITS` (default `metric`)
 - `WEATHER_LANG` (default `de`)
 - `WEATHER_TIMEOUT_MS` (default `4500`)
 
-## Calendar Function (echt)
+### Calendar (`/api/calendar`)
 
-`GET /api/calendar` ruft serverseitig Google Calendar (Service Account) ab und reduziert auf kommende Termine.
-
-Erforderliche Variablen:
-
+Pflicht:
 - `GCAL_CLIENT_EMAIL`
 - `GCAL_PRIVATE_KEY` (`\n` escaped erlaubt)
 - `GCAL_CALENDAR_ID`
 
 Optional:
-
 - `GCAL_TIMEZONE` (default `Europe/Berlin`)
 - `GCAL_MAX_RESULTS` (default `5`)
 - `GCAL_TIMEOUT_MS` (default `5000`)
 
-## Weitere Functions
+### Feed (`/api/feed`)
 
-- `GET /api/health` – Health-Status (Mock).
-- `GET /health` – Legacy-Health-Endpunkt.
+Optional:
+- `FEED_DEFAULT_SOURCE` (default `hn`)
+- `FEED_MAX_ITEMS` (default `3`)
+- `FEED_TIMEOUT_MS` (default `5000`)
+- `FEED_SOURCES_JSON` (allowlist für sichere Quellen)
+
+## Editor-Workflow (lokal)
+
+Editor öffnen:
+- `?mode=editor`
+
+Im Editor möglich:
+- Seiten hinzufügen / umbenennen
+- Widgets hinzufügen / entfernen / Up-Down sortieren
+- einfache Widget-Konfigfelder bearbeiten
+- JSON exportieren (anzeigen + herunterladen)
+- JSON importieren (Textfeld oder Datei)
+- Preview im Dashboard: `?mode=dashboard&preview=1`
+
+Wichtig:
+- Änderungen sind lokal im Browserzustand (kein Server-Save).
+- Preview nutzt temporär `localStorage`.
+
+## Debug-Logging
+
+Aktivieren über:
+- URL: `?debug=1`
+- oder `localStorage.setItem('dashboard_debug', '1')`
+
+Dann werden zusätzliche Debug-Logs für App/Widgets ausgegeben.
