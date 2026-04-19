@@ -1,0 +1,17 @@
+{
+  "pages": [
+    {
+      "name": "Startseite",
+      "widgets": [
+        {
+          "type": "clock",
+          "title": "Aktuelle Zeit"
+        },
+        {
+          "type": "weather",
+          "title": "Wetter"
+        }
+      ]
+    }
+  ]
+}
