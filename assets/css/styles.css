@@ -1,0 +1,167 @@
+/* Kindle Smart Dashboard
+   Minimalistische Basis für ein E-Ink-freundliches Layout.
+*/
+
+:root {
+  --bg: #ffffff;
+  --text: #111111;
+  --muted: #5f5f5f;
+  --line: #e8e8e8;
+  --card-radius: 14px;
+  --space-1: 0.5rem;
+  --space-2: 1rem;
+  --space-3: 1.5rem;
+  --space-4: 2rem;
+  --space-5: 3rem;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto,
+    Helvetica, Arial, sans-serif;
+}
+
+body {
+  min-height: 100vh;
+  line-height: 1.45;
+}
+
+.dashboard {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: var(--space-5) var(--space-4);
+}
+
+.dashboard__header {
+  margin-bottom: var(--space-4);
+}
+
+.eyebrow {
+  margin: 0 0 var(--space-1);
+  font-size: 0.95rem;
+  letter-spacing: 0.02em;
+  color: var(--muted);
+}
+
+h1,
+h2,
+h3,
+p {
+  margin: 0;
+}
+
+h1 {
+  font-size: clamp(2.15rem, 5vw, 3.35rem);
+  font-weight: 650;
+  letter-spacing: -0.02em;
+  margin-bottom: var(--space-2);
+}
+
+.subline {
+  font-size: 1.1rem;
+  color: var(--muted);
+}
+
+.status-area {
+  margin-bottom: var(--space-3);
+}
+
+.status-message {
+  border: 1px solid var(--line);
+  border-radius: var(--card-radius);
+  padding: var(--space-3);
+  color: var(--muted);
+  background: #fbfbfb;
+}
+
+.status-message--error {
+  color: var(--text);
+}
+
+.widget-grid {
+  display: grid;
+  gap: var(--space-3);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.widget-card {
+  border: 1px solid var(--line);
+  border-radius: var(--card-radius);
+  padding: var(--space-3);
+  min-height: 170px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.widget-card--wide {
+  grid-column: 1 / -1;
+}
+
+.widget-card__title {
+  font-size: 0.95rem;
+  color: var(--muted);
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.widget-clock {
+  min-height: 260px;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  gap: var(--space-1);
+}
+
+.widget-clock__time,
+.widget-clock__date {
+  display: block;
+}
+
+.widget-clock__time {
+  font-size: clamp(4rem, 14vw, 8rem);
+  line-height: 1;
+  letter-spacing: -0.04em;
+  font-weight: 650;
+}
+
+.widget-clock__date {
+  margin-top: var(--space-1);
+  font-size: clamp(1.1rem, 3vw, 1.65rem);
+  color: var(--muted);
+}
+
+.widget-placeholder {
+  justify-content: center;
+}
+
+.widget-placeholder__hint {
+  color: var(--muted);
+  font-size: 1.05rem;
+}
+
+@media (max-width: 720px) {
+  .dashboard {
+    padding: var(--space-4) var(--space-3);
+  }
+
+  .widget-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .widget-card--wide {
+    grid-column: auto;
+  }
+
+  .widget-clock {
+    min-height: 220px;
+  }
+}
