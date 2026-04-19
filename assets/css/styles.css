@@ -139,6 +139,133 @@ h1 {
   color: var(--muted);
 }
 
+.widget-weather {
+  justify-content: center;
+}
+
+.widget-weather__location {
+  font-size: 1.2rem;
+  color: var(--muted);
+}
+
+.widget-weather__temp {
+  font-size: clamp(2.2rem, 7vw, 3.75rem);
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  font-weight: 620;
+}
+
+.widget-weather__condition,
+.widget-weather__range,
+.widget-weather__loading,
+.widget-weather__error {
+  font-size: 1rem;
+  color: var(--muted);
+}
+
+.widget-weather__error {
+  color: var(--text);
+}
+
+
+.widget-calendar {
+  justify-content: flex-start;
+}
+
+.widget-calendar__loading,
+.widget-calendar__error,
+.widget-calendar__empty {
+  font-size: 1rem;
+  color: var(--muted);
+}
+
+.widget-calendar__error {
+  color: var(--text);
+}
+
+.widget-calendar__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.widget-calendar__item {
+  display: grid;
+  grid-template-columns: 86px 1fr;
+  gap: var(--space-2);
+  align-items: start;
+  padding-top: var(--space-1);
+  border-top: 1px solid var(--line);
+}
+
+.widget-calendar__item:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.widget-calendar__time {
+  font-size: 0.95rem;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.widget-calendar__title {
+  font-size: 1rem;
+  color: var(--text);
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+
+.widget-feed {
+  justify-content: flex-start;
+}
+
+.widget-feed__source {
+  font-size: 0.95rem;
+  color: var(--muted);
+}
+
+.widget-feed__loading,
+.widget-feed__empty,
+.widget-feed__error {
+  font-size: 1rem;
+  color: var(--muted);
+}
+
+.widget-feed__error {
+  color: var(--text);
+}
+
+.widget-feed__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.widget-feed__item {
+  font-size: 1rem;
+  line-height: 1.35;
+  border-top: 1px solid var(--line);
+  padding-top: var(--space-1);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.widget-feed__item:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+
 .widget-placeholder {
   justify-content: center;
 }

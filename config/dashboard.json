@@ -9,7 +9,21 @@
         },
         {
           "type": "weather",
-          "title": "Wetter"
+          "title": "Wetter",
+          "endpoint": "/api/weather"
+        },
+        {
+          "type": "calendar",
+          "title": "Kalender",
+          "endpoint": "/api/calendar",
+          "maxItems": 3
+        },
+        {
+          "type": "feed",
+          "title": "News Feed",
+          "endpoint": "/api/feed",
+          "source": "hn",
+          "maxItems": 3
         }
       ]
     }

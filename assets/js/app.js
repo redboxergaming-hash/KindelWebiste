@@ -50,12 +50,18 @@
     statusArea.innerHTML = `<p class="${cssClass}">${message}</p>`;
   }
 
+  function clearWidgetCleanupCallbacks() {
+    widgetCleanupCallbacks.forEach((cleanup) => cleanup());
+    widgetCleanupCallbacks.length = 0;
+  }
+
   function renderWidgets(widgets) {
     const grid = document.getElementById("widget-grid");
     if (!grid) {
       return;
     }
 
+    clearWidgetCleanupCallbacks();
     grid.innerHTML = "";
 
     widgets.forEach((widgetConfig) => {
@@ -78,11 +84,6 @@
     });
   }
 
-  function clearWidgetCleanupCallbacks() {
-    widgetCleanupCallbacks.forEach((cleanup) => cleanup());
-    widgetCleanupCallbacks.length = 0;
-  }
-
   function renderPageHeader(page) {
     const title = document.getElementById("page-title");
     if (title) {
@@ -101,8 +102,6 @@
   }
 
   async function bootstrapDashboard() {
-    clearWidgetCleanupCallbacks();
-
     try {
       const config = await loadDashboardConfig();
       const firstPage = config.pages[0];
